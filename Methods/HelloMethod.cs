@@ -12,9 +12,10 @@ public sealed class HelloMethod : IRunnerMethod
     private readonly GreetingService _greetings;
     private readonly NexoClient _client;
 
-    public HelloMethod(GreetingService greetings)
+    public HelloMethod(GreetingService greetings, NexoClient nexoClient)
     {
         _greetings = greetings;
+        _client = nexoClient;
     }
 
     public string NameMethod() => "Nexowa metoda";
