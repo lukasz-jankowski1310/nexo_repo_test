@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>Template.Module</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>12.0</LangVersion>
+    <IsPackable>false</IsPackable>
+    <DefaultItemExcludes>$(DefaultItemExcludes);tests/**;tools/**;artifacts/**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Runner supplies Core at runtime. Do not include its DLL in the module ZIP. -->
+    <PackageReference Include="Zapqio.Runner.Module.Core" Version="1.2.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <!-- Web's Runner mode overrides PublishDir. Keep the ZIP beside that directory. -->
+  <Target Name="ZipAfterPublish" AfterTargets="Publish">
+    <PropertyGroup>
+      <ModuleZipPath>$(PublishDir)../module.zip</ModuleZipPath>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(PublishDir)##Dll" Lines="$(TargetFileName)" Overwrite="true" Encoding="UTF-8" />
+    <Delete Files="$(ModuleZipPath)" Condition="Exists('$(ModuleZipPath)')" />
+    <ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(ModuleZipPath)" />
+    <Message Importance="High" Text="Module package: $(ModuleZipPath)" />
+  </Target>
+</Project>

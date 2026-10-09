@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>12.0</LangVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Template.Module.csproj" />
+    <!-- This local host supplies the runtime contract, just as the real runner does. -->
+    <PackageReference Include="Zapqio.Runner.Module.Core" Version="1.2.0" />
+  </ItemGroup>
+</Project>
