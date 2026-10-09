@@ -23,7 +23,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          dotnet restore Nexo.TestConnect.csproj --source https://api.nuget.org/v3/index.json --nologo
+          dotnet restore Template.Module.csproj --source https://api.nuget.org/v3/index.json --nologo
           if ($LASTEXITCODE -ne 0) {
             throw 'Could not restore public NuGet packages.'
           }
@@ -92,12 +92,13 @@ jobs:
           }
 
           $output = Join-Path $env:RUNNER_TEMP 'nexo-module-output'
-          dotnet publish Nexo.TestConnect.csproj --no-restore -c Release -o "$output/publish" "-p:nexoSdkBinPath=$($sdk.DirectoryName)\" --nologo
+          dotnet publish Template.Module.csproj --no-restore -c Release -o "$output/publish" "-p:nexoSdkBinPath=$($sdk.DirectoryName)\" --nologo
           if ($LASTEXITCODE -ne 0) {
             throw 'Module compilation failed.'
           }
 
-          $zip = Join-Path $output 'Nexo.TestConnect.zip'
+          # ZipAfterPublish in the .csproj writes module.zip beside PublishDir.
+          $zip = Join-Path $output 'module.zip'
           $package = [IO.Compression.ZipFile]::OpenRead($zip)
           try {
             $reader = [IO.StreamReader]::new($package.GetEntry('##Dll').Open())
@@ -108,7 +109,7 @@ jobs:
               $reader.Dispose()
             }
 
-            if ($dll -ne 'Nexo.TestConnect.dll' -or -not $package.GetEntry($dll)) {
+            if ($dll -ne 'Template.Module.dll' -or -not $package.GetEntry($dll)) {
               throw 'Invalid module ZIP.'
             }
 
@@ -119,8 +120,6 @@ jobs:
           finally {
             $package.Dispose()
           }
-
-          Copy-Item -LiteralPath $zip -Destination (Join-Path $output 'module.zip')
 
       # Web selects the artifact for the exact commit chosen in the deployment.
       - name: Upload module for Web
