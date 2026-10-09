@@ -1,3 +1,5 @@
+using InsERT.Moria.Uzytkownicy;
+using Nexo;
 using System.Text.Json;
 using Template.Module.Models;
 using Template.Module.Services;
@@ -8,13 +10,14 @@ namespace Template.Module.Methods;
 public sealed class HelloMethod : IRunnerMethod
 {
     private readonly GreetingService _greetings;
+    private readonly NexoClient _client;
 
     public HelloMethod(GreetingService greetings)
     {
         _greetings = greetings;
     }
 
-    public string NameMethod() => "template-dotnet-hello";
+    public string NameMethod() => "Nexowa metoda";
 
     public Type InData() => typeof(HelloInput);
 
@@ -37,8 +40,10 @@ public sealed class HelloMethod : IRunnerMethod
             throw new ArgumentException("The Name field must be a non-empty string.", nameof(data));
         }
 
+        var userData = _client.Uchwyt.PodajObiektTypu<IZalogowanyUzytkownik>().Dane;
+
         // Per-call values stay local: runner methods and injected services are singletons.
-        var output = new HelloOutput { Message = _greetings.Create(input.Name.Trim()) };
+        var output = new HelloOutput { Message = _greetings.Create(userData.Sygnatura) };
         if (JobContext.Current is { } context)
         {
             RunnerLog.Debug($"Job {context.JobId}, attempt {context.AttemptId}.");
